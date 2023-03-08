@@ -1,3 +1,5 @@
+const { v4: uuidv4 } = require("uuid");
+
 module.exports = class Editor {
   constructor(blockEditor) {
     this.blockEditor = blockEditor;
@@ -6,23 +8,38 @@ module.exports = class Editor {
     this.addBlock();
   }
 
-  addBlock(type = "text", insertAfterIdx = -1) {
-    debugger;
+  addBlock(type = "text", insertAfterBlock = null) {
     this.blockEditor.editor;
     const block = document.createElement("div");
-    block.id = `block-${insertAfterIdx + 1}`;
+    const blockId = uuidv4();
+    block.id = `block-${blockId}`;
     block.style.height = "200px";
     block.style.width = "100%";
     block.style.position = "relative";
     block.style.marginTop = "20px";
+    block.className = "block";
 
     // add this block at the appropriate position
-    if (insertAfterIdx >= 0) {
-      const previousBlock = document.getElementById(`block-${insertAfterIdx}`);
+    if (insertAfterBlock) {
+      // insert the block
+      const previousBlock = document.getElementById(
+        `block-${insertAfterBlock}`
+      );
       previousBlock.after(block);
+      const prevBlockIdx = this.blocks.findIndex(
+        (block) => (block.blockId = insertAfterBlock)
+      );
+
+      // data json data for this block
+      this.blocks.splice(prevBlockIdx + 1, 0, {
+        type,
+        blockId,
+        content: "",
+        options: {},
+      });
     } else {
       // there is no existing block
-      this.blocks.push({ type, content: "", options: {} });
+      this.blocks.push({ type, blockId, content: "", options: {} });
       this.blockEditor.editor.append(block);
     }
 
@@ -46,7 +63,7 @@ module.exports = class Editor {
     textBox.style.height = "90%";
     textBox.style.width = "100%";
     textBox.style.padding = "5px";
-    textBox.innerText = insertAfterIdx;
+    textBox.innerText = insertAfterBlock;
     block.append(textBox);
 
     // add plus button
@@ -59,7 +76,7 @@ module.exports = class Editor {
 
     // add event listner
     addBtn.addEventListener("click", () => {
-      this.addBlock("text", insertAfterIdx + 1);
+      this.addBlock("text", blockId);
     });
     block.append(addBtn);
   }
