@@ -1,0 +1,27 @@
+{
+  "name": "block-editor",
+  "version": "1.0.0",
+  "description": "A basic block editor ",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ats1999/block-editor.git"
+  },
+  "keywords": [
+    "editor",
+    "mde"
+  ],
+  "author": "ats1999",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ats1999/block-editor/issues"
+  },
+  "homepage": "https://github.com/ats1999/block-editor#readme",
+  "devDependencies": {
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
+  }
+}
