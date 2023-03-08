@@ -97,14 +97,19 @@ module.exports = class Editor {
       this.removeBlock(blockId);
     });
     block.append(deleteBtn);
+
+    // render block
+    this.renderBlock(blockId);
   }
 
   setBlockContent(content, blockId) {
     this.blocks[this.getBlockIdx(blockId)].content = content;
+    this.renderBlock(blockId);
   }
 
   setBlockType(type, blockId) {
     this.blocks[this.getBlockIdx(blockId)].type = type;
+    this.renderBlock(blockId);
   }
 
   removeBlock(blockId) {
@@ -129,11 +134,15 @@ module.exports = class Editor {
       (block) => block.blockId === blockId
     );
     this.blocks.splice(blockIdx, 1);
-
-    // TODO: remove viewer div
+    // TODO: remove content block
   }
 
   getBlockIdx(blockId) {
     return this.blocks.findIndex((block) => block.blockId === blockId);
+  }
+
+  renderBlock(blockId) {
+    const blockIdx = this.getBlockIdx(blockId);
+    // TODO: update content block
   }
 };
