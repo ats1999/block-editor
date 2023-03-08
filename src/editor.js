@@ -56,6 +56,9 @@ module.exports = class Editor {
     blockTypeSelector.style.position = "absolute";
     blockTypeSelector.style.left = "0px";
     blockTypeSelector.style.top = "-20px";
+    blockTypeSelector.addEventListener("change", (e) => {
+      this.setBlockType(e.target.value, blockId);
+    });
     block.append(blockTypeSelector);
 
     // add text area
@@ -63,7 +66,9 @@ module.exports = class Editor {
     textBox.style.height = "90%";
     textBox.style.width = "100%";
     textBox.style.padding = "5px";
-    textBox.innerText = insertAfterBlock;
+    textBox.addEventListener("blur", (e) => {
+      this.setBlockContent(e.target.value, blockId);
+    });
     block.append(textBox);
 
     // add plus button
@@ -79,14 +84,56 @@ module.exports = class Editor {
       this.addBlock("text", blockId);
     });
     block.append(addBtn);
+
+    // add delete button
+    const deleteBtn = document.createElement("button");
+    deleteBtn.innerText = "Delete";
+    deleteBtn.style.position = "absolute";
+    deleteBtn.style.top = "0px";
+    deleteBtn.style.left = "100px";
+    deleteBtn.style.top = "-20px";
+    deleteBtn.style.cursor = "pointer";
+    deleteBtn.addEventListener("click", () => {
+      this.removeBlock(blockId);
+    });
+    block.append(deleteBtn);
   }
 
-  setBlockContent() {}
-  setBlockType() {}
+  setBlockContent(content, blockId) {
+    this.blocks[this.getBlockIdx(blockId)].content = content;
+  }
 
-  removeBlock(idx) {
-    if (!idx) {
+  setBlockType(type, blockId) {
+    this.blocks[this.getBlockIdx(blockId)].type = type;
+  }
+
+  removeBlock(blockId) {
+    if (!blockId) {
       throw "Indxe value is required for removeBlock function";
     }
+
+    if (this.blocks.length <= 1) {
+      alert("Last block can not be removed");
+      return;
+    }
+
+    if (!confirm("Are you sure?")) {
+      return;
+    }
+
+    // remove block from DOM
+    document.getElementById(`block-${blockId}`).remove();
+
+    // remove block from array
+    const blockIdx = this.blocks.findIndex(
+      (block) => block.blockId === blockId
+    );
+    this.blocks.splice(blockIdx, 1);
+
+    // TODO: remove viewer div
+  }
+
+  getBlockIdx(blockId) {
+    return this.blocks.findIndex((block) => block.blockId === blockId);
   }
 };
