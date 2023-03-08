@@ -27,7 +27,7 @@ module.exports = class Editor {
       );
       previousBlock.after(block);
       const prevBlockIdx = this.blocks.findIndex(
-        (block) => (block.blockId = insertAfterBlock)
+        (block) => block.blockId == insertAfterBlock
       );
 
       // data json data for this block
