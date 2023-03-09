@@ -1,5 +1,6 @@
 const renderer = require("./renderer");
 const { v4: uuidv4 } = require("uuid");
+const debounce = require("debounce");
 
 module.exports = class Editor {
   constructor(blockEditor) {
@@ -78,9 +79,12 @@ module.exports = class Editor {
     textBox.style.height = "90%";
     textBox.style.width = "95%";
     textBox.style.padding = "5px";
-    textBox.addEventListener("blur", (e) => {
-      this.setBlockContent(e.target.value, blockId);
-    });
+    textBox.addEventListener(
+      "keyup",
+      debounce((e) => {
+        this.setBlockContent(e.target.value, blockId);
+      }, 100)
+    );
     block.append(textBox);
 
     // add plus button
