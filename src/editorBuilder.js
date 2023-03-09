@@ -32,7 +32,7 @@ module.exports = class Editor {
 
   createViewer() {
     this.viewer = document.createElement("div");
-    this.viewer.id = "editor-" + this.containerId;
+    this.viewer.id = "viewer-" + this.containerId;
     this.container.append(this.viewer);
 
     // adding style in editor

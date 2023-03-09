@@ -1,10 +1,12 @@
+const renderer = require("./renderer");
 const { v4: uuidv4 } = require("uuid");
 
 module.exports = class Editor {
   constructor(blockEditor) {
     this.blockEditor = blockEditor;
     this.blocks = []; // type, content,options
-    this.blockTypes = ["Text", "Heading", "Math", "Markdown", "Chart.js"];
+    this.blockTypes = ["Text", "Heading", "Math", "Markdown", "Chart"];
+    this.headingLevels = [1, 2, 3, 4, 5, 6];
     this.addBlock();
   }
 
@@ -64,7 +66,7 @@ module.exports = class Editor {
     // add text area
     const textBox = document.createElement("textarea");
     textBox.style.height = "90%";
-    textBox.style.width = "100%";
+    textBox.style.width = "95%";
     textBox.style.padding = "5px";
     textBox.addEventListener("blur", (e) => {
       this.setBlockContent(e.target.value, blockId);
@@ -99,7 +101,7 @@ module.exports = class Editor {
     block.append(deleteBtn);
 
     // render block
-    this.renderBlock(blockId);
+    this.renderBlock(blockId, insertAfterBlock);
   }
 
   setBlockContent(content, blockId) {
@@ -108,7 +110,12 @@ module.exports = class Editor {
   }
 
   setBlockType(type, blockId) {
+    this.removeBlockExtension(
+      this.blocks[this.getBlockIdx(blockId)].type,
+      blockId
+    );
     this.blocks[this.getBlockIdx(blockId)].type = type;
+    this.extendBlock(blockId);
     this.renderBlock(blockId);
   }
 
@@ -126,23 +133,90 @@ module.exports = class Editor {
       return;
     }
 
-    // remove block from DOM
+    // remove blocks from DOM
     document.getElementById(`block-${blockId}`).remove();
+    document.getElementById(`content-${blockId}`).remove();
 
     // remove block from array
     const blockIdx = this.blocks.findIndex(
       (block) => block.blockId === blockId
     );
     this.blocks.splice(blockIdx, 1);
-    // TODO: remove content block
   }
 
   getBlockIdx(blockId) {
     return this.blocks.findIndex((block) => block.blockId === blockId);
   }
 
-  renderBlock(blockId) {
-    const blockIdx = this.getBlockIdx(blockId);
+  getBlock(blockId) {
+    return this.blocks[this.getBlockIdx(blockId)];
+  }
+
+  addHeadingLevelSelector(block) {
+    const headingSelector = document.createElement("select");
+    this.headingLevels.forEach((level) => {
+      const option = document.createElement("option");
+      option.value = level;
+      option.innerText = `H${level}`;
+      headingSelector.append(option);
+    });
+
+    // default level is H2
+    headingSelector.value = 2;
+    headingSelector.style.position = "absolute";
+    headingSelector.style.left = "180px";
+    headingSelector.style.top = "-20px";
+    headingSelector.id = `block-heading-selector-${block.blockId}`;
+    headingSelector.addEventListener("change", (e) => {
+      this.blocks[this.getBlockIdx(block.blockId)].options.level =
+        e.target.value;
+    });
+    document.getElementById(`block-${block.blockId}`).append(headingSelector);
+  }
+
+  extendBlock(blockId) {
+    // TODO: add language options
+    const block = this.getBlock(blockId);
+    debugger;
+    switch (block.type) {
+      case "heading":
+        this.addHeadingLevelSelector(block);
+    }
+  }
+
+  removeBlockExtension(prevBlockType, blockId) {
+    switch (prevBlockType) {
+      case "heading":
+        document.getElementById(`block-heading-selector-${blockId}`).remove();
+        delete this.blocks[this.getBlockIdx(blockId)].options.level;
+    }
+  }
+  renderBlock(blockId, prevContentBlockId = null) {
+    const block = this.getBlock(blockId);
+    let contentBlock = document.getElementById(`content-${blockId}`);
+
+    if (contentBlock) {
+      contentBlock.innerHTML = renderer(block);
+      return;
+    }
+    contentBlock = document.createElement("div");
+    contentBlock.id = `content-${blockId}`;
+    contentBlock.className = `content-block-${block.type}`;
+    contentBlock.innerHTML = renderer(block);
+    contentBlock.style.height = "200px";
+    contentBlock.style.width = "100%";
+    contentBlock.style.marginTop = "20px";
+
+    if (prevContentBlockId) {
+      // insert new block after some block
+      document
+        .getElementById(`content-${prevContentBlockId}`)
+        .after(contentBlock);
+    } else {
+      // insert new block at the end
+      this.blockEditor.viewer.append(contentBlock);
+    }
+
     // TODO: update content block
   }
 };
