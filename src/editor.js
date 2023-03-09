@@ -5,8 +5,9 @@ module.exports = class Editor {
   constructor(blockEditor) {
     this.blockEditor = blockEditor;
     this.blocks = []; // type, content,options
-    this.blockTypes = ["Text", "Heading", "Math", "Markdown", "Chart"];
+    this.blockTypes = ["Text", "Heading", "Math", "Markdown", "Chart", "Code"];
     this.headingLevels = [1, 2, 3, 4, 5, 6];
+    this.languages = ["HTML", "CSS", "JavaScript", "JAVA", "C++", "C"];
     this.addBlock();
   }
 
@@ -174,13 +175,37 @@ module.exports = class Editor {
     document.getElementById(`block-${block.blockId}`).append(headingSelector);
   }
 
+  addLangSelector(block) {
+    const langSelector = document.createElement("select");
+    this.languages.forEach((lang) => {
+      const option = document.createElement("option");
+      option.value = lang.toLowerCase();
+      option.innerText = lang;
+      langSelector.append(option);
+    });
+
+    // default language is HTML
+    langSelector.value = "html";
+    langSelector.style.position = "absolute";
+    langSelector.style.left = "180px";
+    langSelector.style.top = "-20px";
+    langSelector.id = `block-lang-selector-${block.blockId}`;
+    langSelector.addEventListener("change", (e) => {
+      this.blocks[this.getBlockIdx(block.blockId)].options.lang =
+        e.target.value;
+    });
+    document.getElementById(`block-${block.blockId}`).append(langSelector);
+  }
   extendBlock(blockId) {
     // TODO: add language options
     const block = this.getBlock(blockId);
-    debugger;
     switch (block.type) {
       case "heading":
         this.addHeadingLevelSelector(block);
+        break;
+      case "code":
+        this.addLangSelector(block);
+        break;
     }
   }
 
@@ -189,6 +214,11 @@ module.exports = class Editor {
       case "heading":
         document.getElementById(`block-heading-selector-${blockId}`).remove();
         delete this.blocks[this.getBlockIdx(blockId)].options.level;
+        break;
+      case "code":
+        document.getElementById(`block-lang-selector-${blockId}`).remove();
+        delete this.blocks[this.getBlockIdx(blockId)].options.lang;
+        break;
     }
   }
   renderBlock(blockId, prevContentBlockId = null) {
