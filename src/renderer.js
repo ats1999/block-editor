@@ -1,22 +1,25 @@
 const MarkdownIt = require("markdown-it");
 const md = new MarkdownIt();
 function text() {}
-function heading(content, { level }) {
-  return `<h${level}>${content}</h${level}>`;
-}
+
 function math() {}
-function markdown(content) {
-  return md.render(content);
-}
+
 function chart() {}
 
-function render({ type, content, blockId, options }) {
-  switch (type) {
-    case "heading":
-      return heading(content, options);
-    case "markdown":
-      return markdown(content);
-  }
-  return content;
+const renderers = {
+  heading: function ({ content, options: { level } }) {
+    return `<h${level}>${content}</h${level}>`;
+  },
+  markdown: function ({ content }) {
+    return md.render(content);
+  },
+  image: function ({ content }) {
+    return `<img src="${content}" alt="${"No alt specified"}"/>`;
+  },
+};
+
+function render(block) {
+  const { type } = block;
+  return renderers[type] ? renderers[type](block) : "";
 }
 module.exports = render;
