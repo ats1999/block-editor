@@ -255,6 +255,7 @@ module.exports = class Editor {
     contentBlock.style.height = "200px";
     contentBlock.style.width = "100%";
     contentBlock.style.marginTop = "20px";
+    contentBlock.style.overflow = "auto";
 
     if (prevContentBlockId) {
       // insert new block after some block

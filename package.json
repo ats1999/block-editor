@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "debounce": "^1.2.1",
+    "markdown-it": "^13.0.1",
     "uuid": "^9.0.0"
   }
 }
