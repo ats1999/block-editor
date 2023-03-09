@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 module.exports = class Editor {
   constructor(blockEditor) {
     this.blockEditor = blockEditor;
-    this.blocks = []; // type, content,options
+    window.blocks = this.blocks = []; // type, content,options
     this.blockTypes = ["Text", "Heading", "Math", "Markdown", "Chart", "Code"];
     this.headingLevels = [1, 2, 3, 4, 5, 6];
     this.languages = ["HTML", "CSS", "JavaScript", "JAVA", "C++", "C"];
@@ -164,6 +164,8 @@ module.exports = class Editor {
 
     // default level is H2
     headingSelector.value = 2;
+    this.blocks[this.getBlockIdx(block.blockId)].options.level = 2;
+
     headingSelector.style.position = "absolute";
     headingSelector.style.left = "180px";
     headingSelector.style.top = "-20px";
@@ -186,6 +188,8 @@ module.exports = class Editor {
 
     // default language is HTML
     langSelector.value = "html";
+    this.blocks[this.getBlockIdx(block.blockId)].options.lang = "html";
+
     langSelector.style.position = "absolute";
     langSelector.style.left = "180px";
     langSelector.style.top = "-20px";
