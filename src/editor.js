@@ -5,7 +5,16 @@ module.exports = class Editor {
   constructor(blockEditor) {
     this.blockEditor = blockEditor;
     window.blocks = this.blocks = []; // type, content,options
-    this.blockTypes = ["Text", "Heading", "Math", "Markdown", "Chart", "Code"];
+    this.blockTypes = [
+      "Text",
+      "Heading",
+      "Math",
+      "Markdown",
+      "Chart",
+      "Code",
+      "Image",
+      "Link",
+    ];
     this.headingLevels = [1, 2, 3, 4, 5, 6];
     this.languages = ["HTML", "CSS", "JavaScript", "JAVA", "C++", "C"];
     this.addBlock();
@@ -173,6 +182,7 @@ module.exports = class Editor {
     headingSelector.addEventListener("change", (e) => {
       this.blocks[this.getBlockIdx(block.blockId)].options.level =
         e.target.value;
+      this.renderBlock(block.blockId);
     });
     document.getElementById(`block-${block.blockId}`).append(headingSelector);
   }
@@ -197,6 +207,7 @@ module.exports = class Editor {
     langSelector.addEventListener("change", (e) => {
       this.blocks[this.getBlockIdx(block.blockId)].options.lang =
         e.target.value;
+      this.renderBlock(block.blockId);
     });
     document.getElementById(`block-${block.blockId}`).append(langSelector);
   }
@@ -250,7 +261,5 @@ module.exports = class Editor {
       // insert new block at the end
       this.blockEditor.viewer.append(contentBlock);
     }
-
-    // TODO: update content block
   }
 };
